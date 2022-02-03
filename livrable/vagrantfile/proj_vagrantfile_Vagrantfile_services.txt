@@ -1,0 +1,44 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos7_proj"
+  config.vbguest.auto_update = false
+  config.vm.box_check_update = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.provision "file", source: "C:\clef\id_rsa.pub", destination: "/home/vagrant/.ssh/authorized_keys"
+  config.vm.provision :shell, path: "script_toutes_vms.sh"
+  config.vm.define "serveur" do |serveur_debut|
+    serveur_debut.vm.hostname = "serveur.proj.b2"
+    serveur_debut.vm.network "private_network", ip: "192.168.2.14", netmask:"255.255.255.0"
+    serveur_debut.vm.provision :shell, path: "script_serveur.sh"
+    serveur_debut.vm.provider "virtualbox" do |serveur|
+      serveur.name = "serveur"
+      serveur.memory = "1024"
+    end
+  end
+  config.vm.define "gitea" do |gitea_debut|
+    gitea_debut.vm.hostname = "gitea.proj.b2"
+    gitea_debut.vm.network "private_network", ip: "192.168.2.11", netmask:"255.255.255.0"
+    gitea_debut.vm.provision :shell, path: "script_gitea.sh"
+    gitea_debut.vm.provider "virtualbox" do |gitea|
+      gitea.name = "gitea"
+      gitea.memory = "1024"
+    end
+  end
+  config.vm.define "mariadb" do |mariadb_debut|
+    mariadb_debut.vm.hostname = "mariadb.proj.b2"
+    mariadb_debut.vm.network "private_network", ip: "192.168.2.12", netmask:"255.255.255.0"
+    mariadb_debut.vm.provision :shell, path: "script_mariadb.sh"
+    mariadb_debut.vm.provider "virtualbox" do |mariadb|
+      mariadb.name = "mariadb"
+      mariadb.memory = "1024"
+    end
+  end
+  config.vm.define "nginx" do |nginx_debut|
+    nginx_debut.vm.hostname = "nginx.proj.b2"
+    nginx_debut.vm.network "private_network", ip: "192.168.2.13", netmask:"255.255.255.0"
+    nginx_debut.vm.provision :shell, path: "script_nginx.sh"
+    nginx_debut.vm.provider "virtualbox" do |nginx|
+      nginx.name = "nginx"
+      nginx.memory = "1024"
+    end
+  end
+end
